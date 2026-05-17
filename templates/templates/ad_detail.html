@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ ad.title }} - Avito Clone{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            {% if ad.image %}
+                <img src="{{ ad.image.url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 500px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+                <h1 class="card-title">{{ ad.title }}</h1>
+                <p class="text-muted">
+                    <strong>Категория:</strong> <a href="{% url 'home' %}?category={{ ad.category.slug }}">{{ ad.category.name }}</a> |
+                    <strong>Дата:</strong> {{ ad.created_at|date:"d E Y г. в H:i" }} |
+                    <strong>Просмотры:</strong> {{ ad.views }}
+                </p>
+                
+                {% if ad.price %}
+                    <h2 class="text-primary">{{ ad.price }} ₽</h2>
+                {% endif %}
+                
+                <hr>
+                
+                <h3>Описание</h3>
+                <p class="card-text" style="white-space: pre-wrap;">{{ ad.description }}</p>
+                
+                <hr>
+                
+                {% if ad.contact_email or ad.contact_phone %}
+                    <h3>Контакты</h3>
+                    {% if ad.contact_email %}
+                        <p><strong>Email:</strong> <a href="mailto:{{ ad.contact_email }}">{{ ad.contact_email }}</a></p>
+                    {% endif %}
+                    {% if ad.contact_phone %}
+                        <p><strong>Телефон:</strong> <a href="tel:{{ ad.contact_phone }}">{{ ad.contact_phone }}</a></p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Информация об авторе</h5>
+                <p class="card-text">
+                    <strong>Автор:</strong> {{ ad.author.username }}<br>
+                    <strong>Дата размещения:</strong> {{ ad.created_at|date:"d.m.Y" }}
+                </p>
+                
+                {% if user.is_authenticated and user == ad.author %}
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'ad_edit' ad.pk %}" class="btn btn-warning">Редактировать</a>
+                        <a href="{% url 'ad_delete' ad.pk %}" class="btn btn-danger">Удалить</a>
+                        <a href="{% url 'ad_toggle_status' ad.pk %}" class="btn btn-{% if ad.status == 'active' %}secondary{% else %}success{% endif %}">
+                            {% if ad.status == 'active' %}Снять с публикации{% else %}Опубликовать{% endif %}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
